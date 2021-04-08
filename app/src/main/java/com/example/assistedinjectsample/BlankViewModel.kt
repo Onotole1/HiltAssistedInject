@@ -1,15 +1,30 @@
 package com.example.assistedinjectsample
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import androidx.lifecycle.ViewModelProvider
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-@HiltViewModel
-class BlankViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+class BlankViewModel @AssistedInject constructor(
+    @Assisted val params: MyInitParams
 ) : ViewModel() {
     // TODO: Implement the ViewModel
-    val id: Long
-        get() = savedStateHandle.id
+
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(initParams: MyInitParams): BlankViewModel
+    }
+
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        fun provideFactory(
+            assistedFactory: ViewModelAssistedFactory,
+            initParams: MyInitParams
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return assistedFactory.create(initParams) as T
+            }
+        }
+    }
 }
